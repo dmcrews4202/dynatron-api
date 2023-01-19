@@ -1,7 +1,15 @@
+using Dynatron_api.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add DbContext
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
+// Add services to the container.
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+//builder.services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -21,5 +29,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+AppDbInitializer.Seed(app);
 
 app.Run();

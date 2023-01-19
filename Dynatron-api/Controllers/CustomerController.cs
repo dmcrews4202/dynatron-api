@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Dynatron_api.Models;
+using Dynatron_api.Data;
 
 namespace Dynatron_api.Controllers;
 
@@ -7,33 +8,45 @@ namespace Dynatron_api.Controllers;
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase
 {
-    [HttpGet]
-    public IEnumerable<Customer> Get()
+    private readonly ICustomerService _service;
+
+    public CustomersController(ICustomerService service)
     {
-        return new Customer[5];
+        _service = service;
+    }
+
+    [HttpGet]
+    public async Task<IEnumerable<Customer>> Get()
+    {
+        var data = await _service.GetAllAsync();
+        return data;
     }
 
     [HttpGet("{id}")]
-    public Customer Get(int id)
+    public async Task<Customer> Get(int id)
     {
-        return new Customer();
+        var data = await _service.GetByIdAsync(id);
+        return data;
     }
 
     [HttpPost]
-    public Customer AddCustomer(Customer customer)
+    public async Task<Customer> AddCustomer(Customer customer)
     {
+        await _service.AddAsync(customer);
         return customer;
     }
 
     [HttpPut("id")]
-    public Customer PutCustomer(int id)
+    public async Task<Customer> PutCustomer(int id, Customer customer)
     {
-        return new Customer();
+        await _service.UpdateAsync(id, customer);
+        return customer;
     }
 
     [HttpDelete("id")]
-    public void DeleteCustomer(int id)
+    public async Task DeleteCustomer(int id)
     {
+        await _service.DeleteAsync(id);
         return;
     }
 }
